@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust BossMonster Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #151b2b 100%);
+            color: #e4e4e4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1a1f2e;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #05998c;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            background: #0f1419;
+            border: 2px solid #05998c;
+            color: #e4e4e4;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #05998c;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: #05998c;
+            box-shadow: 0 4px 12px rgba(5, 153, 140, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section {
+            background: #0f1419;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #05998c;
+        }
+
+        .form-section h3 {
+            color: #05998c;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0a0e1a;
+            border: 1px solid #2a3f4d;
+            border-radius: 6px;
+            color: #e4e4e4;
+            font-size: 14px;
+            transition: border 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #05998c;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .inline-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #05998c;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #047a6f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(5, 153, 140, 0.4);
+        }
+
+        button.secondary {
+            background: #2a3f4d;
+        }
+
+        button.secondary:hover {
+            background: #3a5064;
+        }
+
+        button.danger {
+            background: #c92a2a;
+        }
+
+        button.danger:hover {
+            background: #b02525;
+        }
+
+        .item-list {
+            background: #0a0e1a;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .item-entry {
+            background: #0f1419;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #05998c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .output-section {
+            background: #0a0e1a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .output-section h3 {
+            color: #05998c;
+            margin-bottom: 15px;
+        }
+
+        pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .copy-button {
+            margin-top: 10px;
+        }
+
+        .info-box {
+            background: #2a3f4d;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #05998c;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 2px solid #e4e4e4;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .template-selector {
+            margin-bottom: 20px;
+        }
+
+        .template-button {
+            margin: 5px;
+        }
+
+        .success-message {
+            background: #2d8659;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .error-message {
+            background: #c92a2a;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Rust BossMonster Creator</h1>
+        <p class="subtitle">Create custom boss configurations for the BossMonster plugin</p>
+
+        <div class="template-selector">
+            <div class="form-section">
+                <h3>Quick Start Templates</h3>
+                <div class="button-group">
+                    <button class="template-button" onclick="loadTemplate('melee')">🗡️ Melee Boss</button>
+                    <button class="template-button" onclick="loadTemplate('ranged')">🔫 Ranged Boss</button>
+                    <button class="template-button" onclick="loadTemplate('tank')">🛡️ Tank Boss</button>
+                    <button class="template-button" onclick="loadTemplate('elemental')">⚡ Elemental Boss</button>
+                    <button class="template-button secondary" onclick="resetForm()">🔄 Reset All</button>
+                </div>
+            </div>
+                
+                <div class="info-box" style="margin: 20px 0 15px 0;">
+                    <p><strong>📊 Tiered Templates:</strong> Balanced difficulty progression - customize equipment and theme</p>
+                </div>
+                <div class="button-group">
+                    <button class="template-button" onclick="loadTemplate('normal')" style="border-color: #4ade80;">⭐ Normal Boss</button>
+                    <button class="template-button" onclick="loadTemplate('midlevel')" style="border-color: #facc15;">⭐⭐ Mid-Level Boss</button>
+                    <button class="template-button" onclick="loadTemplate('harder')" style="border-color: #f87171;">⭐⭐⭐ Harder Boss</button>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>📥 Import Existing Boss</h3>
+                <div class="info-box">
+                    <p>Paste your existing boss JSON configuration below to edit it</p>
+                </div>
+                <textarea id="importJson" rows="6" placeholder='Paste your boss JSON here, e.g.:
+{
+  "Name": "MyBoss",
+  "Health": 1000,
+  ...
+}'></textarea>
+                <div class="button-group" style="margin-top: 10px;">
+                    <button onclick="importBoss()">📥 Import Boss Configuration</button>
+                    <button class="secondary" onclick="document.getElementById('importJson').value = ''">Clear</button>
+                </div>
+                <div class="success-message" id="importSuccessMsg">Boss imported successfully!</div>
+                <div class="error-message" id="importErrorMsg">Invalid JSON format. Please check your configuration.</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('basic')">Basic Info</button>
+            <button class="tab-button" onclick="switchTab('equipment')">Equipment</button>
+            <button class="tab-button" onclick="switchTab('loot')">Loot Tables</button>
+            <button class="tab-button" onclick="switchTab('abilities')">Abilities</button>
+            <button class="tab-button" onclick="switchTab('advanced')">Advanced</button>
+            <button class="tab-button" onclick="switchTab('output')">Generate Config</button>
+        </div>
+
+        <!-- Basic Info Tab -->
+        <div id="basic" class="tab-content active">
+            <div class="form-section">
+                <h3>Basic Configuration</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Boss Name *</label>
+                        <input type="text" id="bossName" placeholder="e.g., Clown" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="enabled" checked>
+                        <label>Enabled</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Stats</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Health</label>
+                        <input type="number" id="health" value="1000" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Speed</label>
+                        <input type="number" id="speed" value="7.5" step="0.5" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Scale Damage</label>
+                        <input type="number" id="scaleDamage" value="0.5" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Aim Cone Scale</label>
+                        <input type="number" id="aimCone" value="1.0" step="0.1" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Range Settings</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Roam Range</label>
+                        <input type="number" id="roamRange" value="50" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Chase Range</label>
+                        <input type="number" id="chaseRange" value="75" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Sense Range</label>
+                        <input type="number" id="senseRange" value="50" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Attack Range Multiplier</label>
+                        <input type="number" id="attackRange" value="1.0" step="0.1" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Respawn Settings</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Min Respawn Time (seconds)</label>
+                        <input type="number" id="minRespawn" value="3000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Respawn Time (seconds)</label>
+                        <input type="number" id="maxRespawn" value="4200" min="0">
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="disableAutoRespawn">
+                    <label>Disable Auto Respawn</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="removeCorpse" checked>
+                    <label>Remove Corpse After Death (Recommended)</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Marker Settings</h3>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="useMarker" checked>
+                    <label>Use Map Marker</label>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Marker Radius</label>
+                        <input type="number" id="markerRadius" value="0.2" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Marker Transparency</label>
+                        <input type="number" id="markerAlpha" value="0.6" step="0.1" min="0" max="1">
+                    </div>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Marker Color - Red</label>
+                        <input type="number" id="markerR" value="0.0196" step="0.01" min="0" max="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Marker Color - Green</label>
+                        <input type="number" id="markerG" value="0.6" step="0.01" min="0" max="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Marker Color - Blue</label>
+                        <input type="number" id="markerB" value="0.549" step="0.01" min="0" max="1">
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    Color Preview: <span class="color-preview" id="colorPreview"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Tab -->
+        <div id="equipment" class="tab-content">
+            <div class="form-section">
+                <h3>Wear Items (Clothing/Armor)</h3>
+                <div class="info-box">
+                    <p>Add clothing and armor items for the boss to wear</p>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Item Short Name</label>
+                        <input type="text" id="wearShortName" placeholder="e.g., metal.facemask">
+                    </div>
+                    <div class="form-group">
+                        <label>Skin ID (0 = default)</label>
+                        <input type="number" id="wearSkinID" value="0" min="0">
+                    </div>
+                </div>
+                <button onclick="addWearItem()">➕ Add Wear Item</button>
+                <div id="wearList" class="item-list"></div>
+            </div>
+
+            <div class="form-section">
+                <h3>Belt Items (Weapons/Tools)</h3>
+                <div class="info-box">
+                    <p>Add weapons and items to the boss's belt/inventory</p>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Item Short Name</label>
+                        <input type="text" id="beltShortName" placeholder="e.g., shotgun.pump">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="beltAmount" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Skin ID (0 = default)</label>
+                        <input type="number" id="beltSkinID" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Ammo Type (optional)</label>
+                        <input type="text" id="beltAmmo" placeholder="e.g., ammo.shotgun.fire">
+                    </div>
+                </div>
+                
+                <div class="form-section" style="background: #0a0e1a; margin-top: 15px;">
+                    <h4 style="color: #05998c; margin-bottom: 10px;">Weapon Mods (for weapons only)</h4>
+                    <div class="inline-group">
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modHolosight">
+                            <label>Holosight</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modFlashlight">
+                            <label>Flashlight</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modLasersight">
+                            <label>Laser Sight</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modSilencer">
+                            <label>Silencer</label>
+                        </div>
+                    </div>
+                    <div class="inline-group">
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modScope8x">
+                            <label>8x Scope</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modSimple">
+                            <label>Simple Sight</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modMuzzleBoost">
+                            <label>Muzzle Boost</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="modMuzzleBrake">
+                            <label>Muzzle Brake</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="addBeltItem()">➕ Add Belt Item</button>
+                <div id="beltList" class="item-list"></div>
+            </div>
+        </div>
+
+        <!-- Loot Tab -->
+        <div id="loot" class="tab-content">
+            <div class="form-section">
+                <h3>Loot Table Configuration</h3>
+                <div class="form-group">
+                    <label>Loot Table Type</label>
+                    <select id="lootTableType">
+                        <option value="0">Default</option>
+                        <option value="1">Own Loot Table</option>
+                        <option value="2">AlphaLoot</option>
+                        <option value="3">CustomLoot</option>
+                        <option value="4">Rust Prefab Loot</option>
+                        <option value="5" selected>Combined (Own + Prefab)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Own Loot Items</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Min Items</label>
+                        <input type="number" id="ownLootMin" value="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Items</label>
+                        <input type="number" id="ownLootMax" value="3" min="0">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="ownLootUseCount">
+                        <label>Use Min/Max Values</label>
+                    </div>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Item Short Name</label>
+                        <input type="text" id="lootItemName" placeholder="e.g., scrap">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Amount</label>
+                        <input type="number" id="lootItemMin" value="100" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Amount</label>
+                        <input type="number" id="lootItemMax" value="200" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Drop Chance (%)</label>
+                        <input type="number" id="lootItemChance" value="100" min="0" max="100">
+                    </div>
+                </div>
+                <button onclick="addLootItem()">➕ Add Loot Item</button>
+                <div id="lootItemList" class="item-list"></div>
+            </div>
+
+            <div class="form-section">
+                <h3>Prefab Loot Table</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Min Prefabs</label>
+                        <input type="number" id="prefabMin" value="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Prefabs</label>
+                        <input type="number" id="prefabMax" value="3" min="0">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="prefabUseCount">
+                        <label>Use Min/Max Values</label>
+                    </div>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Prefab Path</label>
+                        <input type="text" id="prefabPath" placeholder="e.g., assets/prefabs/npc/patrol helicopter/heli_crate.prefab">
+                    </div>
+                    <div class="form-group">
+                        <label>Drop Chance (%)</label>
+                        <input type="number" id="prefabChance" value="100" min="0" max="100">
+                    </div>
+                </div>
+                <button onclick="addPrefabItem()">➕ Add Prefab</button>
+                <div id="prefabList" class="item-list"></div>
+            </div>
+
+            <div class="form-section">
+                <h3>Economy Rewards</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Economics</label>
+                        <input type="number" id="economics" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Server Rewards</label>
+                        <input type="number" id="serverRewards" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>IQEconomic</label>
+                        <input type="number" id="iqEconomic" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>XPerience</label>
+                        <input type="number" id="xperience" value="0" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abilities Tab -->
+        <div id="abilities" class="tab-content">
+            <div class="form-section">
+                <h3>Radius Abilities</h3>
+                <div class="info-box">
+                    <p>Abilities that trigger within a radius of the boss. Set cooldown to -1 to disable.</p>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Ability Radius</label>
+                        <input type="number" id="abilityRadius" value="50" min="0">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="oneAbility" checked>
+                        <label>Use Only One Ability at a Time</label>
+                    </div>
+                </div>
+                
+                <h4 style="color: #e94560; margin: 20px 0 10px 0;">Fire Ball</h4>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="fireballCooldown" value="60" min="-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Damage</label>
+                        <input type="number" id="fireballDamage" value="10" min="0">
+                    </div>
+                </div>
+
+                <h4 style="color: #e94560; margin: 20px 0 10px 0;">Spikes</h4>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="spikesCooldown" value="-1" min="-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Damage</label>
+                        <input type="number" id="spikesDamage" value="0" min="0">
+                    </div>
+                </div>
+
+                <h4 style="color: #e94560; margin: 20px 0 10px 0;">Electric Shock</h4>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="electricCooldown" value="-1" min="-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Damage</label>
+                        <input type="number" id="electricDamage" value="0" min="0">
+                    </div>
+                </div>
+
+                <h4 style="color: #e94560; margin: 20px 0 10px 0;">Other Abilities</h4>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Wounded Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="woundedCooldown" value="-1" min="-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Freeze Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="freezeCooldown" value="-1" min="-1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Environmental Effects</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Radiation</label>
+                        <input type="number" id="radiation" value="0" min="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Temperature</label>
+                        <input type="number" id="temperature" value="0" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🐺 Animal Minion Ability</h3>
+                <div class="info-box">
+                    <p>Spawn animal companions to fight alongside the boss. Set cooldown to -1 to disable.</p>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="animalCooldown" value="-1" min="-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Animal Type</label>
+                        <select id="animalType">
+                            <option value="">None</option>
+                            <option value="Wolf">Wolf</option>
+                            <option value="Bear">Bear</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Animals</label>
+                        <input type="number" id="animalCount" value="0" min="0" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Despawn Time (seconds)</label>
+                        <input type="number" id="animalDespawn" value="0" min="0" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>👤 NPC Minion Ability</h3>
+                <div class="info-box">
+                    <p>Spawn NPC guards to assist the boss. Set cooldown to -1 to disable. Configure the NPC settings below.</p>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Cooldown (seconds, -1 to disable)</label>
+                        <input type="number" id="npcCooldown" value="-1" min="-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Number of NPCs</label>
+                        <input type="number" id="npcCount" value="0" min="0" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Despawn Time (seconds)</label>
+                        <input type="number" id="npcDespawn" value="0" min="0" step="0.1">
+                    </div>
+                </div>
+                
+                <div id="npcSettingsSection" style="display: none; margin-top: 20px; padding: 15px; background: #0a0e1a; border-radius: 6px;">
+                    <h4 style="color: #05998c; margin-bottom: 15px;">NPC Configuration</h4>
+                    
+                    <div class="inline-group">
+                        <div class="form-group">
+                            <label>NPC Name(s) (comma separated)</label>
+                            <input type="text" id="npcNames" placeholder="e.g., Guard Heavy, Elite Guard">
+                        </div>
+                        <div class="form-group">
+                            <label>Health</label>
+                            <input type="number" id="npcHealth" value="100" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Speed</label>
+                            <input type="number" id="npcSpeed" value="7.5" step="0.5" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Scale Damage</label>
+                            <input type="number" id="npcScaleDamage" value="1.0" step="0.1" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="inline-group">
+                        <div class="form-group">
+                            <label>Roam Range</label>
+                            <input type="number" id="npcRoamRange" value="10" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Chase Range</label>
+                            <input type="number" id="npcChaseRange" value="75" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Sense Range</label>
+                            <input type="number" id="npcSenseRange" value="50" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Aim Cone Scale</label>
+                            <input type="number" id="npcAimCone" value="2.0" step="0.1" min="0">
+                        </div>
+                    </div>
+                    
+                    <h4 style="color: #05998c; margin: 20px 0 10px 0;">NPC Equipment</h4>
+                    
+                    <label>Wear Items</label>
+                    <div class="inline-group">
+                        <div class="form-group">
+                            <input type="text" id="npcWearShortName" placeholder="Item short name">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="npcWearSkinID" placeholder="Skin ID" value="0" min="0">
+                        </div>
+                    </div>
+                    <button onclick="addNpcWearItem()" class="secondary">Add Wear Item</button>
+                    <div id="npcWearList" class="item-list" style="margin-top: 10px;"></div>
+                    
+                    <label style="margin-top: 15px; display: block;">Belt Items</label>
+                    <div class="inline-group">
+                        <div class="form-group">
+                            <input type="text" id="npcBeltShortName" placeholder="Item short name">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="npcBeltAmount" placeholder="Amount" value="1" min="1">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="npcBeltAmmo" placeholder="Ammo (optional)">
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: #0f1419; border-radius: 6px;">
+                        <label style="margin-bottom: 5px; display: block; font-weight: bold;">Weapon Mods:</label>
+                        <div class="inline-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="npcModHolosight">
+                                <label>Holosight</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="npcModFlashlight">
+                                <label>Flashlight</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="npcModLasersight">
+                                <label>Laser Sight</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="npcModSilencer">
+                                <label>Silencer</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="addNpcBeltItem()" class="secondary">Add Belt Item</button>
+                    <div id="npcBeltList" class="item-list" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Damage Actions</h3>
+                <div class="info-box">
+                    <p>Effects that occur when the boss takes or deals damage</p>
+                </div>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Health Regen from Damage (%)</label>
+                        <input type="number" id="healthRegen" value="0" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Calories Consumed</label>
+                        <input type="number" id="calories" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Water Consumed</label>
+                        <input type="number" id="water" value="20" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div id="advanced" class="tab-content">
+            <div class="form-section">
+                <h3>Combat Settings</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Target Memory Duration (seconds)</label>
+                        <input type="number" id="targetMemory" value="10" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Vision Cone (degrees)</label>
+                        <input type="number" id="visionCone" value="135" min="0" max="360">
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="visionConeOnly">
+                    <label>Detect Target Only in Vision Cone</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="meleeOnly">
+                    <label>Enable Damage with Melee Weapons Only</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="useInvisible">
+                    <label>Use Invisibility Ability (Melee bosses only)</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Navigation & Spawn</h3>
+                <div class="inline-group">
+                    <div class="form-group">
+                        <label>Navigation Grid Type</label>
+                        <select id="navMeshType">
+                            <option value="0" selected>Island (Normal)</option>
+                            <option value="1">Underwater/Underground/Off-map</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Damage Distance Limit (0 = any distance)</label>
+                        <input type="number" id="damageDistance" value="100" min="0">
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="returnFromWater">
+                    <label>Return to Spawn if Below Sea Level</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Notifications</h3>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="chatNotify" checked>
+                    <label>Notify in Chat About Boss Actions</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="disableRadio" checked>
+                    <label>Disable Radio Effects</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Optional Settings</h3>
+                <div class="form-group">
+                    <label>Kit Name (Leave empty to use equipment settings)</label>
+                    <input type="text" id="kitName" placeholder="Optional kit name">
+                </div>
+                <div class="form-group">
+                    <label>Crate Prefab Path (Leave empty for no crate)</label>
+                    <input type="text" id="cratePrefab" placeholder="e.g., assets/prefabs/deployable/large wood storage/box.wooden.large.prefab">
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Tab -->
+        <div id="output" class="tab-content">
+            <div class="form-section">
+                <h3>Generated Configuration</h3>
+                <div class="info-box">
+                    <p>✅ Copy this configuration and save it as <strong>[BossName].json</strong></p>
+                    <p>📁 Place it in: <strong>oxide/data/BossMonster/Bosses/</strong></p>
+                    <p>🔄 Reload the plugin with: <strong>o.reload BossMonster</strong></p>
+                </div>
+                <button onclick="generateConfig()">🔨 Generate Configuration</button>
+                <button class="secondary copy-button" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                <button class="secondary" onclick="downloadConfig()">💾 Download JSON</button>
+                
+                <div class="success-message" id="successMsg">Configuration generated successfully!</div>
+                <div class="error-message" id="errorMsg">Please fill in the Boss Name field!</div>
+                
+                <div class="output-section">
+                    <pre id="configOutput">Click "Generate Configuration" to create your boss config...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage for dynamic items
+        let wearItems = [];
+        let beltItems = [];
+        let lootItems = [];
+        let prefabItems = [];
+        let npcWearItems = [];
+        let npcBeltItems = [];
+
+        // Get weapon mods from checkboxes
+        function getSelectedMods() {
+            const mods = [];
+            if (document.getElementById('modHolosight').checked) mods.push('weapon.mod.holosight');
+            if (document.getElementById('modFlashlight').checked) mods.push('weapon.mod.flashlight');
+            if (document.getElementById('modLasersight').checked) mods.push('weapon.mod.lasersight');
+            if (document.getElementById('modSilencer').checked) mods.push('weapon.mod.silencer');
+            if (document.getElementById('modScope8x').checked) mods.push('weapon.mod.8x.scope');
+            if (document.getElementById('modSimple').checked) mods.push('weapon.mod.simple');
+            if (document.getElementById('modMuzzleBoost').checked) mods.push('weapon.mod.muzzleboost');
+            if (document.getElementById('modMuzzleBrake').checked) mods.push('weapon.mod.muzzlebrake');
+            return mods;
+        }
+
+        function clearModCheckboxes() {
+            document.getElementById('modHolosight').checked = false;
+            document.getElementById('modFlashlight').checked = false;
+            document.getElementById('modLasersight').checked = false;
+            document.getElementById('modSilencer').checked = false;
+            document.getElementById('modScope8x').checked = false;
+            document.getElementById('modSimple').checked = false;
+            document.getElementById('modMuzzleBoost').checked = false;
+            document.getElementById('modMuzzleBrake').checked = false;
+        }
+
+        function getNpcSelectedMods() {
+            const mods = [];
+            if (document.getElementById('npcModHolosight').checked) mods.push('weapon.mod.holosight');
+            if (document.getElementById('npcModFlashlight').checked) mods.push('weapon.mod.flashlight');
+            if (document.getElementById('npcModLasersight').checked) mods.push('weapon.mod.lasersight');
+            if (document.getElementById('npcModSilencer').checked) mods.push('weapon.mod.silencer');
+            return mods;
+        }
+
+        function clearNpcModCheckboxes() {
+            document.getElementById('npcModHolosight').checked = false;
+            document.getElementById('npcModFlashlight').checked = false;
+            document.getElementById('npcModLasersight').checked = false;
+            document.getElementById('npcModSilencer').checked = false;
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Color preview update
+        function updateColorPreview() {
+            const r = parseFloat(document.getElementById('markerR').value) * 255;
+            const g = parseFloat(document.getElementById('markerG').value) * 255;
+            const b = parseFloat(document.getElementById('markerB').value) * 255;
+            document.getElementById('colorPreview').style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        }
+
+        document.getElementById('markerR').addEventListener('input', updateColorPreview);
+        document.getElementById('markerG').addEventListener('input', updateColorPreview);
+        document.getElementById('markerB').addEventListener('input', updateColorPreview);
+        updateColorPreview();
+
+        // Wear items
+        function addWearItem() {
+            const shortName = document.getElementById('wearShortName').value.trim();
+            const skinID = parseInt(document.getElementById('wearSkinID').value) || 0;
+            
+            if (!shortName) {
+                alert('Please enter an item short name');
+                return;
+            }
+            
+            wearItems.push({ ShortName: shortName, SkinID: skinID });
+            updateWearList();
+            
+            document.getElementById('wearShortName').value = '';
+            document.getElementById('wearSkinID').value = '0';
+        }
+
+        function updateWearList() {
+            const list = document.getElementById('wearList');
+            list.innerHTML = wearItems.map((item, index) => `
+                <div class="item-entry">
+                    <span>${item.ShortName} ${item.SkinID > 0 ? `(Skin: ${item.SkinID})` : ''}</span>
+                    <button class="danger" onclick="removeWearItem(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeWearItem(index) {
+            wearItems.splice(index, 1);
+            updateWearList();
+        }
+
+        // Belt items
+        function addBeltItem() {
+            const shortName = document.getElementById('beltShortName').value.trim();
+            const amount = parseInt(document.getElementById('beltAmount').value) || 1;
+            const skinID = parseInt(document.getElementById('beltSkinID').value) || 0;
+            const ammo = document.getElementById('beltAmmo').value.trim();
+            const mods = getSelectedMods();
+            
+            if (!shortName) {
+                alert('Please enter an item short name');
+                return;
+            }
+            
+            beltItems.push({
+                ShortName: shortName,
+                Amount: amount,
+                SkinID: skinID,
+                Mods: mods,
+                Ammo: ammo
+            });
+            updateBeltList();
+            
+            document.getElementById('beltShortName').value = '';
+            document.getElementById('beltAmount').value = '1';
+            document.getElementById('beltSkinID').value = '0';
+            document.getElementById('beltAmmo').value = '';
+            clearModCheckboxes();
+        }
+
+        function updateBeltList() {
+            const list = document.getElementById('beltList');
+            list.innerHTML = beltItems.map((item, index) => `
+                <div class="item-entry">
+                    <span>${item.ShortName} x${item.Amount} ${item.Ammo ? `(${item.Ammo})` : ''} ${item.Mods.length > 0 ? `[Mods: ${item.Mods.length}]` : ''}</span>
+                    <button class="danger" onclick="removeBeltItem(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeBeltItem(index) {
+            beltItems.splice(index, 1);
+            updateBeltList();
+        }
+
+        // Loot items
+        function addLootItem() {
+            const shortName = document.getElementById('lootItemName').value.trim();
+            const minAmount = parseInt(document.getElementById('lootItemMin').value) || 1;
+            const maxAmount = parseInt(document.getElementById('lootItemMax').value) || 1;
+            const chance = parseFloat(document.getElementById('lootItemChance').value) || 100;
+            
+            if (!shortName) {
+                alert('Please enter an item short name');
+                return;
+            }
+            
+            lootItems.push({
+                ShortName: shortName,
+                Minimum: minAmount,
+                Maximum: maxAmount,
+                Chance: chance,
+                IsBluePrint: false,
+                SkinID: 0,
+                Text: null,
+                Name: ""
+            });
+            updateLootItemList();
+            
+            document.getElementById('lootItemName').value = '';
+        }
+
+        function updateLootItemList() {
+            const list = document.getElementById('lootItemList');
+            list.innerHTML = lootItems.map((item, index) => `
+                <div class="item-entry">
+                    <span>${item.ShortName} (${item.Minimum}-${item.Maximum}) ${item.Chance}%</span>
+                    <div>
+                        <button class="secondary" onclick="editLootItem(${index})" style="margin-right: 5px;">✏️ Edit</button>
+                        <button class="danger" onclick="removeLootItem(${index})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeLootItem(index) {
+            lootItems.splice(index, 1);
+            updateLootItemList();
+        }
+
+        // Prefab items
+        function addPrefabItem() {
+            const path = document.getElementById('prefabPath').value.trim();
+            const chance = parseFloat(document.getElementById('prefabChance').value) || 100;
+            
+            if (!path) {
+                alert('Please enter a prefab path');
+                return;
+            }
+            
+            prefabItems.push({
+                Chance: chance,
+                PrefabDefinition: path
+            });
+            updatePrefabList();
+            
+            document.getElementById('prefabPath').value = '';
+        }
+
+        function updatePrefabList() {
+            const list = document.getElementById('prefabList');
+            list.innerHTML = prefabItems.map((item, index) => `
+                <div class="item-entry">
+                    <span>${item.PrefabDefinition.split('/').pop()} ${item.Chance}%</span>
+                    <div>
+                        <button class="secondary" onclick="editPrefabItem(${index})" style="margin-right: 5px;">✏️ Edit</button>
+                        <button class="danger" onclick="removePrefabItem(${index})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removePrefabItem(index) {
+            prefabItems.splice(index, 1);
+            updatePrefabList();
+        }
+
+        // Edit functions for loot items
+        function editLootItem(index) {
+            const item = lootItems[index];
+            document.getElementById('lootItemName').value = item.ShortName;
+            document.getElementById('lootItemMin').value = item.Minimum;
+            document.getElementById('lootItemMax').value = item.Maximum;
+            document.getElementById('lootItemChance').value = item.Chance;
+            lootItems.splice(index, 1);
+            updateLootItemList();
+        }
+
+        function editPrefabItem(index) {
+            const item = prefabItems[index];
+            document.getElementById('prefabPath').value = item.PrefabDefinition;
+            document.getElementById('prefabChance').value = item.Chance;
+            prefabItems.splice(index, 1);
+            updatePrefabList();
+        }
+
+        // NPC Minion functions
+        function addNpcWearItem() {
+            const shortName = document.getElementById('npcWearShortName').value.trim();
+            const skinID = parseInt(document.getElementById('npcWearSkinID').value) || 0;
+            
+            if (!shortName) {
+                alert('Please enter an item short name');
+                return;
+            }
+            
+            npcWearItems.push({ ShortName: shortName, SkinID: skinID });
+            updateNpcWearList();
+            
+            document.getElementById('npcWearShortName').value = '';
+            document.getElementById('npcWearSkinID').value = '0';
+        }
+
+        function updateNpcWearList() {
+            const list = document.getElementById('npcWearList');
+            list.innerHTML = npcWearItems.map((item, index) => `
+                <div class="item-entry">
+                    <span>${item.ShortName} ${item.SkinID > 0 ? `(Skin: ${item.SkinID})` : ''}</span>
+                    <button class="danger" onclick="removeNpcWearItem(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeNpcWearItem(index) {
+            npcWearItems.splice(index, 1);
+            updateNpcWearList();
+        }
+
+        function addNpcBeltItem() {
+            const shortName = document.getElementById('npcBeltShortName').value.trim();
+            const amount = parseInt(document.getElementById('npcBeltAmount').value) || 1;
+            const ammo = document.getElementById('npcBeltAmmo').value.trim();
+            const mods = getNpcSelectedMods();
+            
+            if (!shortName) {
+                alert('Please enter an item short name');
+                return;
+            }
+            
+            npcBeltItems.push({
+                ShortName: shortName,
+                Amount: amount,
+                SkinID: 0,
+                Mods: mods,
+                Ammo: ammo
+            });
+            updateNpcBeltList();
+            
+            document.getElementById('npcBeltShortName').value = '';
+            document.getElementById('npcBeltAmount').value = '1';
+            document.getElementById('npcBeltAmmo').value = '';
+            clearNpcModCheckboxes();
+        }
+
+        function updateNpcBeltList() {
+            const list = document.getElementById('npcBeltList');
+            list.innerHTML = npcBeltItems.map((item, index) => `
+                <div class="item-entry">
+                    <span>${item.ShortName} x${item.Amount} ${item.Ammo ? `(${item.Ammo})` : ''} ${item.Mods.length > 0 ? `[Mods: ${item.Mods.length}]` : ''}</span>
+                    <button class="danger" onclick="removeNpcBeltItem(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeNpcBeltItem(index) {
+            npcBeltItems.splice(index, 1);
+            updateNpcBeltList();
+        }
+
+        // Show/hide NPC settings based on cooldown
+        document.getElementById('npcCooldown').addEventListener('input', function() {
+            const section = document.getElementById('npcSettingsSection');
+            if (parseInt(this.value) >= 0) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        });
+
+        // Helper function to build NPC ability settings
+        function getNpcAbilitySettings() {
+            const cooldown = parseInt(document.getElementById('npcCooldown').value);
+            
+            if (cooldown === -1) {
+                return {
+                    "Ability Cooldown Time (to disable the ability, set the value -1)": -1,
+                    "NPC Settings": null,
+                    "Number of NPCs": 0,
+                    "Despawn time NPCs": 0.0
+                };
+            }
+            
+            const names = document.getElementById('npcNames').value.split(',').map(n => n.trim()).filter(n => n);
+            
+            return {
+                "Ability Cooldown Time (to disable the ability, set the value -1)": cooldown,
+                "NPC Settings": {
+                    "Names": names.length > 0 ? names : ["Guard"],
+                    "Health": parseFloat(document.getElementById('npcHealth').value),
+                    "Roam Range": parseFloat(document.getElementById('npcRoamRange').value),
+                    "Chase Range": parseFloat(document.getElementById('npcChaseRange').value),
+                    "Attack Range Multiplier": 1.0,
+                    "Sense Range": parseFloat(document.getElementById('npcSenseRange').value),
+                    "Target Memory Duration [sec.]": 10.0,
+                    "Scale damage": parseFloat(document.getElementById('npcScaleDamage').value),
+                    "Aim Cone Scale": parseFloat(document.getElementById('npcAimCone').value),
+                    "Detect the target only in the NPC's viewing vision cone? [true/false]": false,
+                    "Vision Cone": 135.0,
+                    "Speed": parseFloat(document.getElementById('npcSpeed').value),
+                    "Disable radio effects? [true/false]": false,
+                    "Wear items": npcWearItems.map(item => ({
+                        "ShortName": item.ShortName,
+                        "SkinID (0 - default)": item.SkinID
+                    })),
+                    "Belt items": npcBeltItems.map(item => ({
+                        "ShortName": item.ShortName,
+                        "Amount": item.Amount,
+                        "SkinID (0 - default)": item.SkinID,
+                        "Mods": item.Mods,
+                        "Ammo": item.Ammo
+                    })),
+                    "Kit (it is recommended to use the previous 2 settings to improve performance)": ""
+                },
+                "Number of NPCs": parseInt(document.getElementById('npcCount').value),
+                "Despawn time NPCs": parseFloat(document.getElementById('npcDespawn').value)
+            };
+        }
+
+        // Generate configuration
+        function generateConfig() {
+            const bossName = document.getElementById('bossName').value.trim();
+            
+            if (!bossName) {
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('successMsg').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            const config = {
+                "Enabled? [true/false]": document.getElementById('enabled').checked,
+                "Name": bossName,
+                "Health": parseFloat(document.getElementById('health').value),
+                "Roam Range": parseFloat(document.getElementById('roamRange').value),
+                "Chase Range": parseFloat(document.getElementById('chaseRange').value),
+                "Attack Range Multiplier": parseFloat(document.getElementById('attackRange').value),
+                "Sense Range": parseFloat(document.getElementById('senseRange').value),
+                "Target Memory Duration [sec.]": parseFloat(document.getElementById('targetMemory').value),
+                "Scale damage": parseFloat(document.getElementById('scaleDamage').value),
+                "Aim Cone Scale": parseFloat(document.getElementById('aimCone').value),
+                "Detect the target only in the NPC's viewing vision cone? [true/false]": document.getElementById('visionConeOnly').checked,
+                "Vision Cone": parseFloat(document.getElementById('visionCone').value),
+                "Speed": parseFloat(document.getElementById('speed').value),
+                "Minimum time of appearance after death [sec.]": parseFloat(document.getElementById('minRespawn').value),
+                "Maximum time of appearance after death [sec.]": parseFloat(document.getElementById('maxRespawn').value),
+                "Disable automatic respawning of boss after death? (True to disable auto respawn) [true/false]": document.getElementById('disableAutoRespawn').checked,
+                "Disable radio effects? [true/false]": document.getElementById('disableRadio').checked,
+                "Remove a corpse after death? (it is recommended to use the true value to improve performance) [true/false]": document.getElementById('removeCorpse').checked,
+                "Wear items": wearItems.map(item => ({
+                    "ShortName": item.ShortName,
+                    "SkinID (0 - default)": item.SkinID
+                })),
+                "Belt items": beltItems.map(item => ({
+                    "ShortName": item.ShortName,
+                    "Amount": item.Amount,
+                    "SkinID (0 - default)": item.SkinID,
+                    "Mods": item.Mods,
+                    "Ammo": item.Ammo
+                })),
+                "Kit (it is recommended to use the previous 2 settings to improve performance)": document.getElementById('kitName').value.trim(),
+                "Marker settings": {
+                    "Do you use the Marker? [true/false]": document.getElementById('useMarker').checked,
+                    "Radius": parseFloat(document.getElementById('markerRadius').value),
+                    "Transparency": parseFloat(document.getElementById('markerAlpha').value),
+                    "Marker color": {
+                        "r": parseFloat(document.getElementById('markerR').value),
+                        "g": parseFloat(document.getElementById('markerG').value),
+                        "b": parseFloat(document.getElementById('markerB').value)
+                    }
+                },
+                "The amount of economics that is given for killing the boss": {
+                    "Economics": parseFloat(document.getElementById('economics').value),
+                    "Server Rewards (minimum 1)": parseInt(document.getElementById('serverRewards').value),
+                    "IQEconomic (minimum 1)": parseInt(document.getElementById('iqEconomic').value),
+                    "XPerience": parseFloat(document.getElementById('xperience').value)
+                },
+                "List of monument locations": [],
+                "If the boss ends up below ocean sea level, should the boss return to it's place of appearance? [true/false]": document.getElementById('returnFromWater').checked,
+                "Type of navigation grid (0 - used mainly on the island, 1 - used mainly under water or under land, as well as outside the map, can be used on some monuments)": parseInt(document.getElementById('navMeshType').value),
+                "The distance at which you can apply damage to the boss (use 0 at any distance)": parseFloat(document.getElementById('damageDistance').value),
+                "Notify in a chat about actions with the boss? [true/false]": document.getElementById('chatNotify').checked,
+                "The path to the crate that appears at the place of death (empty - not used)": document.getElementById('cratePrefab').value.trim(),
+                "Which loot table should the plugin use? (0 - default; 1 - own; 2 - AlphaLoot; 3 - CustomLoot; 4 - loot table of the Rust objects; 5 - combine the 1 and 4 methods)": parseInt(document.getElementById('lootTableType').value),
+                "Loot table from prefabs (if the loot table type is 4 or 5)": {
+                    "Minimum number of prefabs": parseInt(document.getElementById('prefabMin').value),
+                    "Maximum number of prefabs": parseInt(document.getElementById('prefabMax').value),
+                    "Use minimum and maximum values? [true/false]": document.getElementById('prefabUseCount').checked,
+                    "List of prefabs": prefabItems.map(item => ({
+                        "Chance probability [0.0-100.0]": item.Chance,
+                        "The path to the prefab": item.PrefabDefinition
+                    }))
+                },
+                "Own loot table (if the loot table type is 1 or 5)": {
+                    "Minimum number of items": parseInt(document.getElementById('ownLootMin').value),
+                    "Maximum number of items": parseInt(document.getElementById('ownLootMax').value),
+                    "Use minimum and maximum values? [true/false]": document.getElementById('ownLootUseCount').checked,
+                    "List of items": lootItems.map(item => ({
+                        "ShortName": item.ShortName,
+                        "Minimum": item.Minimum,
+                        "Maximum": item.Maximum,
+                        "Chance probability [0.0-100.0]": item.Chance,
+                        "Is this a blueprint? [true/false]": item.IsBluePrint,
+                        "SkinID (0 - default)": item.SkinID,
+                        "Text (empty - default)": item.Text,
+                        "Name (empty - default)": item.Name
+                    }))
+                },
+                "All actions that occur with the player within the NPC radius": {
+                    "Use only one ability at a time? [true/false]": document.getElementById('oneAbility').checked,
+                    "Radius (to disable all abilities, set the value to 0)": parseFloat(document.getElementById('abilityRadius').value),
+                    "Spikes ability cooldown time (to disable the ability, set the value -1)": parseInt(document.getElementById('spikesCooldown').value),
+                    "Applied damage to player from Spikes": parseFloat(document.getElementById('spikesDamage').value),
+                    "FireBall ability cooldown time (to disable the ability, set the value -1)": parseInt(document.getElementById('fireballCooldown').value),
+                    "Applied damage to player from FireBall": parseFloat(document.getElementById('fireballDamage').value),
+                    "ElectricShock ability cooldown time (to disable the ability, set the value -1)": parseInt(document.getElementById('electricCooldown').value),
+                    "Applied damage to player from ElectricShock": parseFloat(document.getElementById('electricDamage').value),
+                    "Wounded ability cooldown time (to disable the ability, set the value -1)": parseInt(document.getElementById('woundedCooldown').value),
+                    "Freeze ability cooldown time (to disable the ability, set the value -1)": parseInt(document.getElementById('freezeCooldown').value),
+                    "Animal Ability Settings": {
+                        "Ability Cooldown Time (to disable the ability, set the value -1)": parseInt(document.getElementById('animalCooldown').value),
+                        "Type of animal (Wolf, Bear)": document.getElementById('animalType').value,
+                        "Number of animals": parseInt(document.getElementById('animalCount').value),
+                        "Despawn time animals": parseFloat(document.getElementById('animalDespawn').value)
+                    },
+                    "NPC Ability Settings": getNpcAbilitySettings(),
+                    "Radiation": parseFloat(document.getElementById('radiation').value),
+                    "Temperature": parseFloat(document.getElementById('temperature').value)
+                },
+                "All actions that occur when applying NPC damage": {
+                    "Disable all abilities when applying damage? [true/false]": false,
+                    "Regeneration of health from the applied damage [%]": parseFloat(document.getElementById('healthRegen').value),
+                    "The amount of calories consumed": parseFloat(document.getElementById('calories').value),
+                    "The amount of water consumed": parseFloat(document.getElementById('water').value),
+                    "The amount of added radiation": 0.0,
+                    "The amount of added bleeding": 0.0
+                },
+                "Use the invisibility ability? (use only for bosses with melee weapons) [true/false]": document.getElementById('useInvisible').checked,
+                "Enable damage to the boss with melee weapons only? [true/false]": document.getElementById('meleeOnly').checked
+            };
+            
+            const json = JSON.stringify(config, null, 2);
+            document.getElementById('configOutput').textContent = json;
+            
+            document.getElementById('successMsg').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('successMsg').style.display = 'none';
+            }, 3000);
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('configOutput').textContent;
+            if (text === 'Click "Generate Configuration" to create your boss config...') {
+                alert('Please generate a configuration first!');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Configuration copied to clipboard!');
+            });
+        }
+
+        function downloadConfig() {
+            const text = document.getElementById('configOutput').textContent;
+            const bossName = document.getElementById('bossName').value.trim() || 'Boss';
+            
+            if (text === 'Click "Generate Configuration" to create your boss config...') {
+                alert('Please generate a configuration first!');
+                return;
+            }
+            
+            const blob = new Blob([text], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${bossName}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Template loading
+        function loadTemplate(type) {
+            resetForm();
+            
+            const templates = {
+                melee: {
+                    name: 'Melee Warrior',
+                    health: 2000,
+                    speed: 8.5,
+                    damage: 0.8,
+                    wear: [
+                        { ShortName: 'metal.facemask', SkinID: 0 },
+                        { ShortName: 'metal.plate.torso', SkinID: 0 },
+                        { ShortName: 'pants', SkinID: 0 }
+                    ],
+                    belt: [
+                        { ShortName: 'knife.bone', Amount: 1, SkinID: 0, Mods: [], Ammo: '' }
+                    ],
+                    abilities: { fireball: -1, spikes: 45, electric: -1 },
+                    invisible: true
+                },
+                ranged: {
+                    name: 'Sniper Boss',
+                    health: 1500,
+                    speed: 6.0,
+                    damage: 1.2,
+                    wear: [
+                        { ShortName: 'hoodie', SkinID: 0 },
+                        { ShortName: 'pants', SkinID: 0 },
+                        { ShortName: 'shoes.boots', SkinID: 0 }
+                    ],
+                    belt: [
+                        { ShortName: 'rifle.bolt', Amount: 1, SkinID: 0, Mods: [], Ammo: 'ammo.rifle' },
+                        { ShortName: 'syringe.medical', Amount: 3, SkinID: 0, Mods: [], Ammo: '' }
+                    ],
+                    abilities: { fireball: -1, spikes: -1, electric: 60 }
+                },
+                tank: {
+                    name: 'Heavy Tank',
+                    health: 3500,
+                    speed: 5.0,
+                    damage: 0.4,
+                    wear: [
+                        { ShortName: 'heavy.plate.helmet', SkinID: 0 },
+                        { ShortName: 'heavy.plate.jacket', SkinID: 0 },
+                        { ShortName: 'heavy.plate.pants', SkinID: 0 }
+                    ],
+                    belt: [
+                        { ShortName: 'lmg.m249', Amount: 1, SkinID: 0, Mods: [], Ammo: 'ammo.rifle' }
+                    ],
+                    abilities: { fireball: -1, spikes: 30, electric: -1 },
+                    npc: {
+                        cooldown: 60,
+                        count: 3,
+                        despawn: 45,
+                        names: 'Guard Heavy',
+                        wear: [{ ShortName: 'hazmatsuit_scientist_peacekeeper', SkinID: 0 }],
+                        belt: [
+                            { ShortName: 'rifle.lr300', Amount: 1, SkinID: 0, Mods: ['weapon.mod.flashlight', 'weapon.mod.holosight'], Ammo: '' }
+                        ]
+                    }
+                },
+                // NEW TIER TEMPLATES
+                normal: {
+                    name: 'Normal Boss',
+                    health: 1000,
+                    speed: 5.0,
+                    damage: 1.0,
+                    aimCone: 2.0,
+                    wear: [{ ShortName: 'hoodie', SkinID: 0 }, { ShortName: 'pants', SkinID: 0 }],
+                    belt: [{ ShortName: 'rifle.ak', Amount: 1, SkinID: 0, Mods: [], Ammo: '' }],
+                    abilities: { fireball: -1, spikes: -1, electric: -1 },
+                    loot: {
+                        prefabMin: 1, prefabMax: 1,
+                        prefabs: [
+                            { Chance: 100, PrefabDefinition: "assets/rust.ai/agents/npcplayer/humannpc/scientist/scientistnpc_heavy.prefab" },
+                            { Chance: 80, PrefabDefinition: "assets/bundled/prefabs/radtown/crate_elite.prefab" },
+                            { Chance: 60, PrefabDefinition: "assets/prefabs/npc/m2bradley/bradley_crate.prefab" },
+                            { Chance: 40, PrefabDefinition: "assets/prefabs/npc/patrol helicopter/heli_crate.prefab" }
+                        ],
+                        ownMin: 1, ownMax: 2,
+                        items: [
+                            { ShortName: 'scrap', Minimum: 1, Maximum: 200, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" },
+                            { ShortName: 'syringe.medical', Minimum: 1, Maximum: 25, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" }
+                        ]
+                    }
+                },
+                midlevel: {
+                    name: 'Mid-Level Boss',
+                    health: 1250,
+                    speed: 6.0,
+                    damage: 1.0,
+                    aimCone: 1.5,
+                    wear: [{ ShortName: 'metal.facemask', SkinID: 0 }, { ShortName: 'jacket', SkinID: 0 }, { ShortName: 'pants', SkinID: 0 }],
+                    belt: [{ ShortName: 'rifle.lr300', Amount: 1, SkinID: 0, Mods: [], Ammo: '' }],
+                    abilities: { fireball: -1, spikes: -1, electric: -1 },
+                    loot: {
+                        prefabMin: 1, prefabMax: 2,
+                        prefabs: [
+                            { Chance: 100, PrefabDefinition: "assets/rust.ai/agents/npcplayer/humannpc/scientist/scientistnpc_heavy.prefab" },
+                            { Chance: 80, PrefabDefinition: "assets/bundled/prefabs/radtown/crate_elite.prefab" },
+                            { Chance: 60, PrefabDefinition: "assets/prefabs/npc/m2bradley/bradley_crate.prefab" },
+                            { Chance: 40, PrefabDefinition: "assets/prefabs/npc/patrol helicopter/heli_crate.prefab" }
+                        ],
+                        ownMin: 1, ownMax: 2,
+                        items: [
+                            { ShortName: 'scrap', Minimum: 1, Maximum: 200, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" },
+                            { ShortName: 'syringe.medical', Minimum: 1, Maximum: 25, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" }
+                        ]
+                    }
+                },
+                harder: {
+                    name: 'Harder Boss',
+                    health: 1500,
+                    speed: 7.0,
+                    damage: 1.0,
+                    aimCone: 1.0,
+                    wear: [{ ShortName: 'metal.facemask', SkinID: 0 }, { ShortName: 'metal.plate.torso', SkinID: 0 }, { ShortName: 'pants', SkinID: 0 }],
+                    belt: [{ ShortName: 'lmg.m249', Amount: 1, SkinID: 0, Mods: [], Ammo: '' }],
+                    abilities: { fireball: -1, spikes: -1, electric: -1 },
+                    loot: {
+                        prefabMin: 1, prefabMax: 3,
+                        prefabs: [
+                            { Chance: 100, PrefabDefinition: "assets/rust.ai/agents/npcplayer/humannpc/scientist/scientistnpc_heavy.prefab" },
+                            { Chance: 80, PrefabDefinition: "assets/bundled/prefabs/radtown/crate_elite.prefab" },
+                            { Chance: 60, PrefabDefinition: "assets/prefabs/npc/m2bradley/bradley_crate.prefab" },
+                            { Chance: 40, PrefabDefinition: "assets/prefabs/npc/patrol helicopter/heli_crate.prefab" }
+                        ],
+                        ownMin: 1, ownMax: 2,
+                        items: [
+                            { ShortName: 'scrap', Minimum: 1, Maximum: 200, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" },
+                            { ShortName: 'syringe.medical', Minimum: 1, Maximum: 25, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" }
+                        ]
+                    }
+                },
+                elemental: {
+                    name: 'Fire Mage',
+                    health: 1200,
+                    speed: 7.0,
+                    damage: 0.6,
+                    wear: [
+                        { ShortName: 'wood.armor.jacket', SkinID: 0 },
+                        { ShortName: 'wood.armor.pants', SkinID: 0 }
+                    ],
+                    belt: [
+                        { ShortName: 'pistol.python', Amount: 1, SkinID: 0, Mods: [], Ammo: 'ammo.pistol.fire' },
+                        { ShortName: 'grenade.molotov', Amount: 5, SkinID: 0, Mods: [], Ammo: '' }
+                    ],
+                    abilities: { fireball: 30, spikes: -1, electric: -1 },
+                    animal: {
+                        cooldown: 60,
+                        type: 'Wolf',
+                        count: 2,
+                        despawn: 45
+                    }
+                }
+            };
+            
+            const template = templates[type];
+            if (!template) return;
+            
+            document.getElementById('bossName').value = template.name;
+            document.getElementById('health').value = template.health;
+            document.getElementById('speed').value = template.speed;
+            document.getElementById('scaleDamage').value = template.damage;
+            
+            wearItems = template.wear;
+            updateWearList();
+            
+            beltItems = template.belt;
+            updateBeltList();
+            
+            if (template.abilities) {
+                document.getElementById('fireballCooldown').value = template.abilities.fireball;
+                document.getElementById('spikesCooldown').value = template.abilities.spikes;
+                document.getElementById('electricCooldown').value = template.abilities.electric;
+            }
+            
+            if (template.invisible) {
+                document.getElementById('useInvisible').checked = true;
+            }
+            
+            // Set up NPC minions
+            if (template.npc) {
+                document.getElementById('npcCooldown').value = template.npc.cooldown;
+                document.getElementById('npcCount').value = template.npc.count;
+                document.getElementById('npcDespawn').value = template.npc.despawn;
+                document.getElementById('npcNames').value = template.npc.names;
+                document.getElementById('npcSettingsSection').style.display = 'block';
+                
+                if (template.npc.wear) {
+                    npcWearItems = template.npc.wear;
+                    updateNpcWearList();
+                }
+                if (template.npc.belt) {
+                    npcBeltItems = template.npc.belt;
+                    updateNpcBeltList();
+                }
+            }
+            
+            // Set up Animal minions
+            if (template.animal) {
+                document.getElementById('animalCooldown').value = template.animal.cooldown;
+                document.getElementById('animalType').value = template.animal.type;
+                document.getElementById('animalCount').value = template.animal.count;
+                document.getElementById('animalDespawn').value = template.animal.despawn;
+            }
+            
+            
+            // Set up custom loot for tier templates
+            if (template.loot) {
+                document.getElementById('prefabMin').value = template.loot.prefabMin;
+                document.getElementById('prefabMax').value = template.loot.prefabMax;
+                prefabItems = template.loot.prefabs;
+                updatePrefabList();
+                
+                document.getElementById('ownLootMin').value = template.loot.ownMin;
+                document.getElementById('ownLootMax').value = template.loot.ownMax;
+                lootItems = template.loot.items;
+                updateLootItemList();
+            } else {
+                // Default loot for themed templates
+                lootItems = [
+                    { ShortName: 'scrap', Minimum: 100, Maximum: 300, Chance: 100, IsBluePrint: false, SkinID: 0, Text: null, Name: "" }
+                ];
+                updateLootItemList();
+                
+                prefabItems = [
+                    { Chance: 50, PrefabDefinition: "assets/prefabs/npc/patrol helicopter/heli_crate.prefab" }
+                ];
+                updatePrefabList();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('bossName').value = '';
+            wearItems = [];
+            beltItems = [];
+            lootItems = [];
+            prefabItems = [];
+            npcWearItems = [];
+            npcBeltItems = [];
+            updateWearList();
+            updateBeltList();
+            updateLootItemList();
+            updatePrefabList();
+            updateNpcWearList();
+            updateNpcBeltList();
+            
+            // Reset all values to defaults
+            document.getElementById('health').value = '1000';
+            document.getElementById('speed').value = '7.5';
+            document.getElementById('scaleDamage').value = '0.5';
+            document.getElementById('fireballCooldown').value = '60';
+            document.getElementById('spikesCooldown').value = '-1';
+            document.getElementById('electricCooldown').value = '-1';
+            
+            // Reset animal and NPC abilities
+            document.getElementById('animalCooldown').value = '-1';
+            document.getElementById('animalType').value = '';
+            document.getElementById('animalCount').value = '0';
+            document.getElementById('animalDespawn').value = '0';
+            
+            document.getElementById('npcCooldown').value = '-1';
+            document.getElementById('npcCount').value = '0';
+            document.getElementById('npcDespawn').value = '0';
+            document.getElementById('npcSettingsSection').style.display = 'none';
+            
+            clearModCheckboxes();
+        }
+
+        // Import Boss Configuration
+        function importBoss() {
+            const jsonText = document.getElementById('importJson').value.trim();
+            
+            if (!jsonText) {
+                showImportError('Please paste a boss configuration');
+                return;
+            }
+            
+            try {
+                const boss = JSON.parse(jsonText);
+                
+                // Reset form first
+                resetForm();
+                
+                // Basic Info
+                document.getElementById('bossName').value = boss.Name || '';
+                document.getElementById('enabled').checked = boss['Enabled? [true/false]'] !== false;
+                document.getElementById('health').value = boss.Health || 1000;
+                document.getElementById('speed').value = boss.Speed || 7.5;
+                document.getElementById('scaleDamage').value = boss['Scale damage'] || 0.5;
+                document.getElementById('aimCone').value = boss['Aim Cone Scale'] || 1.0;
+                
+                // Range Settings
+                document.getElementById('roamRange').value = boss['Roam Range'] || 50;
+                document.getElementById('chaseRange').value = boss['Chase Range'] || 75;
+                document.getElementById('senseRange').value = boss['Sense Range'] || 50;
+                document.getElementById('attackRange').value = boss['Attack Range Multiplier'] || 1.0;
+                
+                // Respawn Settings
+                document.getElementById('minRespawn').value = boss['Minimum time of appearance after death [sec.]'] || 3000;
+                document.getElementById('maxRespawn').value = boss['Maximum time of appearance after death [sec.]'] || 4200;
+                document.getElementById('disableAutoRespawn').checked = boss['Disable automatic respawning of boss after death? (True to disable auto respawn) [true/false]'] || false;
+                document.getElementById('removeCorpse').checked = boss['Remove a corpse after death? (it is recommended to use the true value to improve performance) [true/false]'] !== false;
+                
+                // Marker Settings
+                if (boss['Marker settings']) {
+                    const marker = boss['Marker settings'];
+                    document.getElementById('useMarker').checked = marker['Do you use the Marker? [true/false]'] !== false;
+                    document.getElementById('markerRadius').value = marker.Radius || 0.2;
+                    document.getElementById('markerAlpha').value = marker.Transparency || 0.6;
+                    if (marker['Marker color']) {
+                        document.getElementById('markerR').value = marker['Marker color'].r || 0.0196;
+                        document.getElementById('markerG').value = marker['Marker color'].g || 0.6;
+                        document.getElementById('markerB').value = marker['Marker color'].b || 0.549;
+                        updateColorPreview();
+                    }
+                }
+                
+                // Wear Items
+                if (boss['Wear items'] && Array.isArray(boss['Wear items'])) {
+                    wearItems = boss['Wear items'].map(item => ({
+                        ShortName: item.ShortName,
+                        SkinID: item['SkinID (0 - default)'] || 0
+                    }));
+                    updateWearList();
+                }
+                
+                // Belt Items
+                if (boss['Belt items'] && Array.isArray(boss['Belt items'])) {
+                    beltItems = boss['Belt items'].map(item => ({
+                        ShortName: item.ShortName,
+                        Amount: item.Amount || 1,
+                        SkinID: item['SkinID (0 - default)'] || 0,
+                        Mods: item.Mods || [],
+                        Ammo: item.Ammo || ''
+                    }));
+                    updateBeltList();
+                }
+                
+                // Loot Settings
+                document.getElementById('lootTableType').value = boss['Which loot table should the plugin use? (0 - default; 1 - own; 2 - AlphaLoot; 3 - CustomLoot; 4 - loot table of the Rust objects; 5 - combine the 1 and 4 methods)'] || 5;
+                
+                // Own Loot Table
+                if (boss['Own loot table (if the loot table type is 1 or 5)']) {
+                    const ownLoot = boss['Own loot table (if the loot table type is 1 or 5)'];
+                    document.getElementById('ownLootMin').value = ownLoot['Minimum number of items'] || 1;
+                    document.getElementById('ownLootMax').value = ownLoot['Maximum number of items'] || 3;
+                    document.getElementById('ownLootUseCount').checked = ownLoot['Use minimum and maximum values? [true/false]'] || false;
+                    
+                    if (ownLoot['List of items'] && Array.isArray(ownLoot['List of items'])) {
+                        lootItems = ownLoot['List of items'].map(item => ({
+                            ShortName: item.ShortName,
+                            Minimum: item.Minimum || 1,
+                            Maximum: item.Maximum || 1,
+                            Chance: item['Chance probability [0.0-100.0]'] || 100,
+                            IsBluePrint: item['Is this a blueprint? [true/false]'] || false,
+                            SkinID: item['SkinID (0 - default)'] || 0,
+                            Text: item['Text (empty - default)'],
+                            Name: item['Name (empty - default)'] || ''
+                        }));
+                        updateLootItemList();
+                    }
+                }
+                
+                // Prefab Loot Table
+                if (boss['Loot table from prefabs (if the loot table type is 4 or 5)']) {
+                    const prefabLoot = boss['Loot table from prefabs (if the loot table type is 4 or 5)'];
+                    document.getElementById('prefabMin').value = prefabLoot['Minimum number of prefabs'] || 1;
+                    document.getElementById('prefabMax').value = prefabLoot['Maximum number of prefabs'] || 3;
+                    document.getElementById('prefabUseCount').checked = prefabLoot['Use minimum and maximum values? [true/false]'] || false;
+                    
+                    if (prefabLoot['List of prefabs'] && Array.isArray(prefabLoot['List of prefabs'])) {
+                        prefabItems = prefabLoot['List of prefabs'].map(item => ({
+                            Chance: item['Chance probability [0.0-100.0]'] || 100,
+                            PrefabDefinition: item['The path to the prefab'] || ''
+                        }));
+                        updatePrefabList();
+                    }
+                }
+                
+                // Economy Rewards
+                if (boss['The amount of economics that is given for killing the boss']) {
+                    const econ = boss['The amount of economics that is given for killing the boss'];
+                    document.getElementById('economics').value = econ.Economics || 0;
+                    document.getElementById('serverRewards').value = econ['Server Rewards (minimum 1)'] || 0;
+                    document.getElementById('iqEconomic').value = econ['IQEconomic (minimum 1)'] || 0;
+                    document.getElementById('xperience').value = econ.XPerience || 0;
+                }
+                
+                // Radius Abilities
+                if (boss['All actions that occur with the player within the NPC radius']) {
+                    const radius = boss['All actions that occur with the player within the NPC radius'];
+                    document.getElementById('oneAbility').checked = radius['Use only one ability at a time? [true/false]'] !== false;
+                    document.getElementById('abilityRadius').value = radius['Radius (to disable all abilities, set the value to 0)'] || 50;
+                    document.getElementById('spikesCooldown').value = radius['Spikes ability cooldown time (to disable the ability, set the value -1)'] || -1;
+                    document.getElementById('spikesDamage').value = radius['Applied damage to player from Spikes'] || 0;
+                    document.getElementById('fireballCooldown').value = radius['FireBall ability cooldown time (to disable the ability, set the value -1)'] || -1;
+                    document.getElementById('fireballDamage').value = radius['Applied damage to player from FireBall'] || 0;
+                    document.getElementById('electricCooldown').value = radius['ElectricShock ability cooldown time (to disable the ability, set the value -1)'] || -1;
+                    document.getElementById('electricDamage').value = radius['Applied damage to player from ElectricShock'] || 0;
+                    document.getElementById('woundedCooldown').value = radius['Wounded ability cooldown time (to disable the ability, set the value -1)'] || -1;
+                    document.getElementById('freezeCooldown').value = radius['Freeze ability cooldown time (to disable the ability, set the value -1)'] || -1;
+                    document.getElementById('radiation').value = radius.Radiation || 0;
+                    document.getElementById('temperature').value = radius.Temperature || 0;
+                    
+                    // Animal Abilities
+                    if (radius['Animal Ability Settings']) {
+                        const animal = radius['Animal Ability Settings'];
+                        document.getElementById('animalCooldown').value = animal['Ability Cooldown Time (to disable the ability, set the value -1)'] || -1;
+                        document.getElementById('animalType').value = animal['Type of animal (Wolf, Bear)'] || '';
+                        document.getElementById('animalCount').value = animal['Number of animals'] || 0;
+                        document.getElementById('animalDespawn').value = animal['Despawn time animals'] || 0;
+                    }
+                    
+                    // NPC Abilities
+                    if (radius['NPC Ability Settings']) {
+                        const npc = radius['NPC Ability Settings'];
+                        const cooldown = npc['Ability Cooldown Time (to disable the ability, set the value -1)'] || -1;
+                        document.getElementById('npcCooldown').value = cooldown;
+                        document.getElementById('npcCount').value = npc['Number of NPCs'] || 0;
+                        document.getElementById('npcDespawn').value = npc['Despawn time NPCs'] || 0;
+                        
+                        if (cooldown >= 0 && npc['NPC Settings']) {
+                            document.getElementById('npcSettingsSection').style.display = 'block';
+                            const settings = npc['NPC Settings'];
+                            
+                            document.getElementById('npcNames').value = (settings.Names || []).join(', ');
+                            document.getElementById('npcHealth').value = settings.Health || 100;
+                            document.getElementById('npcSpeed').value = settings.Speed || 7.5;
+                            document.getElementById('npcScaleDamage').value = settings['Scale damage'] || 1.0;
+                            document.getElementById('npcRoamRange').value = settings['Roam Range'] || 10;
+                            document.getElementById('npcChaseRange').value = settings['Chase Range'] || 75;
+                            document.getElementById('npcSenseRange').value = settings['Sense Range'] || 50;
+                            document.getElementById('npcAimCone').value = settings['Aim Cone Scale'] || 2.0;
+                            
+                            if (settings['Wear items']) {
+                                npcWearItems = settings['Wear items'].map(item => ({
+                                    ShortName: item.ShortName,
+                                    SkinID: item['SkinID (0 - default)'] || 0
+                                }));
+                                updateNpcWearList();
+                            }
+                            
+                            if (settings['Belt items']) {
+                                npcBeltItems = settings['Belt items'].map(item => ({
+                                    ShortName: item.ShortName,
+                                    Amount: item.Amount || 1,
+                                    SkinID: item['SkinID (0 - default)'] || 0,
+                                    Mods: item.Mods || [],
+                                    Ammo: item.Ammo || ''
+                                }));
+                                updateNpcBeltList();
+                            }
+                        }
+                    }
+                }
+                
+                // Damage Actions
+                if (boss['All actions that occur when applying NPC damage']) {
+                    const damage = boss['All actions that occur when applying NPC damage'];
+                    document.getElementById('healthRegen').value = damage['Regeneration of health from the applied damage [%]'] || 0;
+                    document.getElementById('calories').value = damage['The amount of calories consumed'] || 0;
+                    document.getElementById('water').value = damage['The amount of water consumed'] || 0;
+                }
+                
+                // Advanced Settings
+                document.getElementById('targetMemory').value = boss['Target Memory Duration [sec.]'] || 10;
+                document.getElementById('visionCone').value = boss['Vision Cone'] || 135;
+                document.getElementById('visionConeOnly').checked = boss['Detect the target only in the NPC\'s viewing vision cone? [true/false]'] || false;
+                document.getElementById('meleeOnly').checked = boss['Enable damage to the boss with melee weapons only? [true/false]'] || false;
+                document.getElementById('useInvisible').checked = boss['Use the invisibility ability? (use only for bosses with melee weapons) [true/false]'] || false;
+                document.getElementById('navMeshType').value = boss['Type of navigation grid (0 - used mainly on the island, 1 - used mainly under water or under land, as well as outside the map, can be used on some monuments)'] || 0;
+                document.getElementById('damageDistance').value = boss['The distance at which you can apply damage to the boss (use 0 at any distance)'] || 100;
+                document.getElementById('returnFromWater').checked = boss['If the boss ends up below ocean sea level, should the boss return to it\'s place of appearance? [true/false]'] || false;
+                document.getElementById('chatNotify').checked = boss['Notify in a chat about actions with the boss? [true/false]'] !== false;
+                document.getElementById('disableRadio').checked = boss['Disable radio effects? [true/false]'] !== false;
+                document.getElementById('kitName').value = boss['Kit (it is recommended to use the previous 2 settings to improve performance)'] || '';
+                document.getElementById('cratePrefab').value = boss['The path to the crate that appears at the place of death (empty - not used)'] || '';
+                
+                showImportSuccess();
+                
+            } catch (error) {
+                console.error('Import error:', error);
+                showImportError('Invalid JSON format: ' + error.message);
+            }
+        }
+
+        function showImportSuccess() {
+            document.getElementById('importSuccessMsg').style.display = 'block';
+            document.getElementById('importErrorMsg').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('importSuccessMsg').style.display = 'none';
+            }, 3000);
+        }
+
+        function showImportError(message) {
+            document.getElementById('importErrorMsg').textContent = message;
+            document.getElementById('importErrorMsg').style.display = 'block';
+            document.getElementById('importSuccessMsg').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('importErrorMsg').style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
